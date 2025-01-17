@@ -1,49 +1,68 @@
 import request from 'supertest';
-import express from 'express';
-import commentsRouter from '../routes/commentRoutes';
+import mongoose from 'mongoose';
+import app from '../app'; // Assuming your Express app is exported from app.ts
+import Comment from '../models/comment';
+import Post from '../models/post';
 
-const app = express();
-app.use(express.json());
-app.use('/comments', commentsRouter);
+beforeAll(async () => {
+    const dbUrl = 'mongodb://localhost:27017/testdb'; // Replace with your test DB URL
+    await mongoose.connect(dbUrl);
+});
+
+afterAll(async () => {
+  await mongoose?.connection?.db?.dropDatabase();
+  await mongoose.disconnect();
+});
 
 describe('Comments Routes', () => {
-  test('POST /comments - Create a new comment', async () => {
+  let post: any;
+
+  beforeEach(async () => {
+    await Comment.deleteMany({});
+    await Post.deleteMany({});
+    post = await Post.create({ title: 'Test Post', content: 'Test Content', sender: 'User1' });
+  });
+
+  test('POST /comments - should create a new comment', async () => {
     const response = await request(app)
       .post('/comments')
-      .send({ text: 'Test comment' }); // Mock request payload
-
+      .send({ content: 'Test Comment', post: post._id });
     expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body.text).toBe('Test comment');
+    expect(response.body.content).toBe('Test Comment');
   });
 
-  test('GET /comments - Get all comments', async () => {
+  test('GET /comments - should retrieve all comments', async () => {
+    await Comment.create({ content: 'Comment 1', post: post._id });
+    await Comment.create({ content: 'Comment 2', post: post._id });
+
     const response = await request(app).get('/comments');
-
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBeTruthy();
+    expect(response.body.length).toBe(2);
   });
 
-  test('GET /comments/:id - Get a comment by ID', async () => {
-    const response = await request(app).get('/comments/1'); // Mock ID
+  test('GET /comments/:id - should retrieve a specific comment by ID', async () => {
+    const comment = await Comment.create({ content: 'Specific Comment', post: post._id });
 
+    const response = await request(app).get(`/comments/${comment._id}`);
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('id', '1');
+    expect(response.body.content).toBe('Specific Comment');
   });
 
-  test('PUT /comments/:id - Update a comment by ID', async () => {
+  test('PUT /comments/:id - should update a comment', async () => {
+    const comment = await Comment.create({ content: 'Old Content', post: post._id });
+
     const response = await request(app)
-      .put('/comments/1')
-      .send({ text: 'Updated comment' });
-
+      .put(`/comments/${comment._id}`)
+      .send({ content: 'Updated Content' });
     expect(response.status).toBe(200);
-    expect(response.body.text).toBe('Updated comment');
+    expect(response.body.content).toBe('Updated Content');
   });
 
-  test('DELETE /comments/:id - Delete a comment by ID', async () => {
-    const response = await request(app).delete('/comments/1'); // Mock ID
+  test('DELETE /comments/:id - should delete a comment', async () => {
+    const comment = await Comment.create({ content: 'To Delete', post: post._id });
 
+    const response = await request(app).delete(`/comments/${comment._id}`);
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('message', 'Comment deleted successfully');
+    expect(response.body.message).toBe('Post deleted');
   });
 });

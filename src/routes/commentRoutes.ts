@@ -1,5 +1,6 @@
 import express from 'express';
 import { createComment, getComments, getCommentById, updateComment, deleteComment } from '../controllers/commentController';
+import { authenticate } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -9,11 +10,39 @@ const router = express.Router();
  * /comments:
  *   post:
  *     summary: Create a new comment
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Content of the comment
+ *               post:
+ *                 type: string
+ *                 description: ID of the associated post
  *     responses:
  *       201:
  *         description: Comment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *                 post:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
  */
-router.post('/', createComment);
+router.post('/', authenticate, createComment);
 
 // Route to get all comments
 /**
@@ -24,6 +53,19 @@ router.post('/', createComment);
  *     responses:
  *       200:
  *         description: A list of comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   post:
+ *                     type: string
  */
 router.get('/', getComments);
 
@@ -43,6 +85,17 @@ router.get('/', getComments);
  *     responses:
  *       200:
  *         description: The requested comment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *                 post:
+ *                   type: string
  */
 router.get('/:id', getCommentById);
 
@@ -52,6 +105,8 @@ router.get('/:id', getCommentById);
  * /comments/{id}:
  *   put:
  *     summary: Update a comment by ID
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -59,11 +114,34 @@ router.get('/:id', getCommentById);
  *         description: The ID of the comment
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Updated content of the comment
  *     responses:
  *       200:
  *         description: Comment updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *                 post:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
  */
-router.put('/:id', updateComment);
+router.put('/:id', authenticate, updateComment);
 
 // Route to delete a specific comment by ID
 /**
@@ -71,6 +149,8 @@ router.put('/:id', updateComment);
  * /comments/{id}:
  *   delete:
  *     summary: Delete a comment by ID
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -81,7 +161,16 @@ router.put('/:id', updateComment);
  *     responses:
  *       200:
  *         description: Comment deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
  */
-router.delete('/:id', deleteComment);
+router.delete('/:id', authenticate, deleteComment);
 
 export default router;

@@ -14,7 +14,7 @@ export const getCommentById = async (req: any, res: any) => {
 };
 
 export const createComment = async (req: any, res: any) => {
-  const { content, post } = req.body;
+  const { content, post, sender } = req.body;
   const comment = new Comment({
     content,
     post

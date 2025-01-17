@@ -32,8 +32,8 @@ describe('Comments Routes', () => {
   });
 
   test('GET /comments - should retrieve all comments', async () => {
-    await Comment.create({ content: 'Comment 1', post: post._id });
-    await Comment.create({ content: 'Comment 2', post: post._id });
+    await Comment.create({ content: 'Comment 1', post: post._id, sender: 'User1' });
+    await Comment.create({ content: 'Comment 2', post: post._id, sender: 'User2' });
 
     const response = await request(app).get('/comments');
     expect(response.status).toBe(200);
@@ -41,7 +41,7 @@ describe('Comments Routes', () => {
   });
 
   test('GET /comments/:id - should retrieve a specific comment by ID', async () => {
-    const comment = await Comment.create({ content: 'Specific Comment', post: post._id });
+    const comment = await Comment.create({ content: 'Specific Comment', post: post._id, sender: 'User1' });
 
     const response = await request(app).get(`/comments/${comment._id}`);
     expect(response.status).toBe(200);
@@ -49,7 +49,7 @@ describe('Comments Routes', () => {
   });
 
   test('PUT /comments/:id - should update a comment', async () => {
-    const comment = await Comment.create({ content: 'Old Content', post: post._id });
+    const comment = await Comment.create({ content: 'Old Content', post: post._id, sender: 'User1' });
 
     const response = await request(app)
       .put(`/comments/${comment._id}`)
@@ -59,7 +59,7 @@ describe('Comments Routes', () => {
   });
 
   test('DELETE /comments/:id - should delete a comment', async () => {
-    const comment = await Comment.create({ content: 'To Delete', post: post._id });
+    const comment = await Comment.create({ content: 'To Delete', post: post._id, sender: 'User1' });
 
     const response = await request(app).delete(`/comments/${comment._id}`);
     expect(response.status).toBe(200);

@@ -1,7 +1,8 @@
 import Post from "../models/post";
 
 export const createPost = async (req: any, res: any) => {
-  const { title, content, sender } = req.body;
+  const { title, content } = req.body;
+  const sender = req.user;
   const post = new Post({
     title,
     content,
@@ -25,26 +26,25 @@ export const getPosts = async (req: any, res: any) => {
 
 export const getPostById = async (req: any, res: any) => {
   const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "Post not found" });
+  if (!post) return res.sendStatus(404);
 
   res.json(post);
 };
 
 export const updatePost = async (req: any, res: any) => {
   const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "Post not found" });
+  if (!post) return res.sendStatus(404);
 
-  const { title, content, sender } = req.body;
+  const { title, content } = req.body;
   post.title = title || post.title;
   post.content = content || post.content;
-  post.sender = sender || post.sender;
   await post.save();
   res.json(post);
 };
 
 export const deletePost = async (req: any, res: any) => {
   const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ message: "Post not found" });
-  await Post.deleteOne({ _id: req.params.id });
+  if (!post) res.sendStatus(404);
+  await Post.findByIdAndDelete({ _id: req.params.id });
   res.json({ message: "Post deleted" });
 };

@@ -1,5 +1,10 @@
 import express from 'express';
-import { loginUser, registerUser } from '../controllers/authController';
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshToken,
+} from '../controllers/authController';
 
 const router = express.Router();
 
@@ -17,13 +22,15 @@ const router = express.Router();
  *             properties:
  *               email:
  *                 type: string
+ *                 description: User email
  *               password:
  *                 type: string
+ *                 description: User password
  *     responses:
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: Validation error or user already exists
+ *         description: User already exists
  */
 router.post('/register', registerUser);
 
@@ -31,7 +38,7 @@ router.post('/register', registerUser);
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Login a user
+ *     summary: Log in a user
  *     requestBody:
  *       required: true
  *       content:
@@ -45,10 +52,56 @@ router.post('/register', registerUser);
  *                 type: string
  *     responses:
  *       200:
- *         description: Login successful, returns token
+ *         description: Login successful
  *       401:
  *         description: Invalid credentials
  */
 router.post('/login', loginUser);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Log out a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *       400:
+ *         description: Refresh token required
+ */
+router.post('/logout', logoutUser);
+
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Access token refreshed successfully
+ *       400:
+ *         description: Refresh token required
+ *       403:
+ *         description: Invalid refresh token
+ */
+router.post('/refresh', refreshToken);
 
 export default router;

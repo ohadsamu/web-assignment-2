@@ -31,9 +31,6 @@ const router = express.Router();
  *               content:
  *                 type: string
  *                 description: Content of the post
- *               sender:
- *                 type: string
- *                 description: Author of the post
  *     responses:
  *       201:
  *         description: Post created successfully
@@ -139,8 +136,6 @@ router.get('/:id', getPostById);
  *               title:
  *                 type: string
  *               content:
- *                 type: string
- *               sender:
  *                 type: string
  *     responses:
  *       200:

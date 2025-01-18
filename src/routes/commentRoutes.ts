@@ -39,6 +39,8 @@ const router = express.Router();
  *                   type: string
  *                 post:
  *                   type: string
+ *                 sender:
+ *                   type: string
  *       401:
  *         description: Unauthorized
  */
@@ -65,6 +67,8 @@ router.post('/', authenticate, createComment);
  *                   content:
  *                     type: string
  *                   post:
+ *                     type: string
+ *                   sender:
  *                     type: string
  */
 router.get('/', getComments);
@@ -95,6 +99,8 @@ router.get('/', getComments);
  *                 content:
  *                   type: string
  *                 post:
+ *                   type: string 
+ *                 sender:
  *                   type: string
  */
 router.get('/:id', getCommentById);
@@ -137,6 +143,8 @@ router.get('/:id', getCommentById);
  *                 content:
  *                   type: string
  *                 post:
+ *                   type: string
+*                 sender:
  *                   type: string
  *       401:
  *         description: Unauthorized

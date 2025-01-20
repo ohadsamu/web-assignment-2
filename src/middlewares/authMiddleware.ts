@@ -2,9 +2,11 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_fallback';
 
 export const authenticate = async (req: any, res: any, next: any) => {
+    if (JWT_SECRET == 'secret_key_fallback')
+        console.error('No seret key found!!')
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
